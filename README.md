@@ -67,8 +67,8 @@ Open the project in Visual Studio 2013
 
 ## Project Contributors
 
-1. M. Huzayfa
-2. Romen Ahmed Apu
+1. G.Muhammed
+2. Romen Ahamed Apu
 
 ## Screenshots
 
