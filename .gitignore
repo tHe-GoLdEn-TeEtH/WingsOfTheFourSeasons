@@ -154,3 +154,8 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+
+# Player data files (different on every machine)
+settings.txt
+leaderboard.txt
+save.txt
