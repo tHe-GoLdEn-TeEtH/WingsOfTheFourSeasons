@@ -81,6 +81,20 @@ void playThunderSound()
 	}
 }
 
+void startDramaSound()
+{
+	if (sfxEnabled)
+	{
+		mciSendString("play dramasound repeat", NULL, 0, NULL);
+	}
+}
+
+void stopDramaSound()
+{
+	mciSendString("stop dramasound", NULL, 0, NULL);
+	mciSendString("seek dramasound to start", NULL, 0, NULL);
+}
+
 void playGameOverSound()
 {
 	if (sfxEnabled)

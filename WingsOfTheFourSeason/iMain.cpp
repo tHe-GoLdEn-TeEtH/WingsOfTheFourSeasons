@@ -95,6 +95,7 @@ void fixedUpdate()
 			totalGameFrameCounter = 0;
 
 			gameState = 10;
+			mciSendString("pause bgsong", NULL, 0, NULL);
 			resetStory();
 		}
 
@@ -284,6 +285,7 @@ void iMouse(int button, int state, int mx, int my)
 				totalGameFrameCounter = 0;
 
 				gameState = 10;
+				mciSendString("pause bgsong", NULL, 0, NULL);
 				resetStory();
 			}
 
@@ -346,6 +348,7 @@ int main()
 	mciSendString("open \"Audios//HurtSound.mp3\" alias hurtsound", NULL, 0, NULL);
 	mciSendString("open \"Audios//RainThunder.mp3\" alias rainsound", NULL, 0, NULL);
 	mciSendString("open \"Audios//Thunder.mp3\" alias thundersound", NULL, 0, NULL);
+	mciSendString("open \"Audios//Drama.mp3\" alias dramasound", NULL, 0, NULL);
 	// Playing the background audio on repeat
 	mciSendString("play bgsong repeat", NULL, 0, NULL);
 

@@ -38,6 +38,8 @@ void loadStorySlides()
 
 void resetStory()
 {
+	startDramaSound();
+
 	currentSlideIndex = 0;
 	previousSlideIndex = 0;
 	slideState = 1;
@@ -67,6 +69,7 @@ void updateStory()
 			// Final slide waits for Enter instead of auto-advancing
 			if (isKeyPressed(13))
 			{
+				stopDramaSound();
 				gameState = 1;
 				resetLevel1();
 			}
