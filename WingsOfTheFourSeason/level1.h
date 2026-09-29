@@ -178,8 +178,11 @@ void spawnStraw(int i)
 
 void resetLevel1()
 {
+	startWindSound();
+
 	aeroX = 450;
 	aeroY = 320;
+
 	aeroFacingRight = true;
 	currentAeroFrame = 0;
 	aeroAnimCounter = 0;

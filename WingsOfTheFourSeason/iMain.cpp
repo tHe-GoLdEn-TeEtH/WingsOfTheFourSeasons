@@ -133,12 +133,19 @@ void fixedUpdate()
 			leaveToMenuRequested = false;
 			gameState = 0;
 			applyMusicSetting();
+			stopWindSound();
+		}
+
+		if (gameOver)
+		{
+			stopWindSound();
 		}
 
 		if (levelComplete && (isKeyPressed(13)))
 		{
 			writeSaveData(currentPlayerName, 2, totalGameSeconds);
 			startTransitionSlides(0, 2);
+			stopWindSound();
 		}
 	}
 	else if (gameState == 2)
@@ -349,6 +356,7 @@ int main()
 	mciSendString("open \"Audios//RainThunder.mp3\" alias rainsound", NULL, 0, NULL);
 	mciSendString("open \"Audios//Thunder.mp3\" alias thundersound", NULL, 0, NULL);
 	mciSendString("open \"Audios//Drama.mp3\" alias dramasound", NULL, 0, NULL);
+	mciSendString("open \"Audios//WinterWind.mp3\" alias windsound", NULL, 0, NULL);
 	// Playing the background audio on repeat
 	mciSendString("play bgsong repeat", NULL, 0, NULL);
 
