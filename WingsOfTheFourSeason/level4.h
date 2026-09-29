@@ -109,7 +109,6 @@ const int NET_DRAW_HEIGHT_4 = 110;
 // PICKUPS & POWERUPS
 // ----------------------------------------------------------------------------
 // Seeds of Hope (+6 Nature Points)
-// Seeds of Hope (+6 Nature Points)
 const int MAX_SEEDS_4 = 9;
 int  seedX4[MAX_SEEDS_4];
 int  seedY4[MAX_SEEDS_4];
@@ -844,7 +843,7 @@ void drawLevel4()
 		glPopMatrix();
 	}
 
-	// 4. AERIAL HANGING NET TRAPS (suspended by a long rope from above)
+	// 4. AERIAL HANGING NET TRAPS (suspended by a textured rope from a wooden crossbar above)
 	for (int i = 0; i < NET_COUNT_4; i++)
 	{
 		int nx = wrapScreenX(netX4[i], cameraX);
@@ -860,16 +859,38 @@ void drawLevel4()
 		glTranslatef((float)nx, (float)(ny + nh), 0.0f);
 		glRotatef(netSway, 0.0f, 0.0f, 1.0f);
 
-		// Long rope stretching from the net's pivot up past the top of the screen,
+		// Long rope stretching from the net's pivot up to the crossbar,
 		// swaying together with the net so it reads as a single hanging object
 		float ropeLength = 720.0f - (float)(ny + nh) + 80.0f;
-		iSetColor(90, 65, 40);
-		glLineWidth(3.0f);
+
+		// Twisted-fiber texture: a slightly thicker dark core with lighter
+		// diagonal strand highlights running along its length
+		glLineWidth(4.0f);
+		iSetColor(70, 48, 28);
 		glBegin(GL_LINES);
 		glVertex2f(0.0f, 0.0f);
 		glVertex2f(0.0f, ropeLength);
 		glEnd();
-		glLineWidth(1.0f);
+
+		glLineWidth(1.5f);
+		iSetColor(150, 115, 70);
+		int twistCount = (int)(ropeLength / 14.0f);
+		for (int t = 0; t < twistCount; t++)
+		{
+			float segY = t * 14.0f;
+			glBegin(GL_LINES);
+			glVertex2f(-2.5f, segY);
+			glVertex2f(2.5f, segY + 7.0f);
+			glEnd();
+		}
+
+		// Wooden crossbar the rope is tied to, at the top of the rope
+		int barW = 46;
+		int barH = 8;
+		glColor4f(0.36f, 0.24f, 0.14f, 1.0f);
+		iFilledRectangle((int)(-barW / 2), (int)ropeLength - (barH / 2), barW, barH);
+		glColor4f(0.20f, 0.13f, 0.07f, 1.0f);
+		iFilledRectangle((int)(-barW / 2), (int)ropeLength - (barH / 2), barW, 2);
 
 		iShowImage(-nw / 2, -nh, nw, nh, netTrapTex4);
 		glPopMatrix();
