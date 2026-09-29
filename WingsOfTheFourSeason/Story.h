@@ -228,26 +228,26 @@ void loadTransitionSlides()
 	// After Level 1 (Winter) -> before Level 2 (Monsoon)
 	transitionSlideTextures[0][0] = iLoadImage("Assets/Slides/W1.png");
 	transitionSlideTextures[0][1] = iLoadImage("Assets/Slides/W2.png");
-	strcpy_s(transitionSlideText[0][0], "The frost is broken. Nature takes its first breath again.");
-	strcpy_s(transitionSlideText[0][1], "But the storm is coming. Aero must follow the waters into a new season.");
+	strcpy_s(transitionSlideText[0][0], "Winter's grip has loosened, and the frozen rivers begin to sing once more.");
+	strcpy_s(transitionSlideText[0][1], "But far to the south, dark clouds gather, and the rains of Monsoon await Aero's wings.");
 
 	// After Level 2 (Monsoon) -> before Level 3 (Summer)
 	transitionSlideTextures[1][0] = iLoadImage("Assets/Slides/R1.png");
 	transitionSlideTextures[1][1] = iLoadImage("Assets/Slides/R2.png");
-	strcpy_s(transitionSlideText[1][0], "The waters flow freely again. Life returns with every drop.");
-	strcpy_s(transitionSlideText[1][1], "The rain has passed. Now Aero must cross a land thirsty for life.");
+	strcpy_s(transitionSlideText[1][0], "The floods recede and the jungle breathes easy once more, thanks to Aero's courage.");
+	strcpy_s(transitionSlideText[1][1], "Now the desert sun calls, its heat rising over dunes that have long forgotten rain.");
 
 	// After Level 3 (Summer) -> before Level 4 (Spring)
 	transitionSlideTextures[2][0] = iLoadImage("Assets/Slides/S1.png");
 	transitionSlideTextures[2][1] = iLoadImage("Assets/Slides/S2.png");
-	strcpy_s(transitionSlideText[2][0], "The dry land drinks once more. Hope begins to bloom.");
+	strcpy_s(transitionSlideText[2][0], "The desert blooms again, and Aero presses onward, weary but unbroken.");
 	strcpy_s(transitionSlideText[2][1], "One season remains. Spring's hunters wait in the meadow, guarding the last piece of balance.");
 
 	// After Level 4 (Spring) -> Game Complete screen
 	transitionSlideTextures[3][0] = iLoadImage("Assets/Slides/Sp1.png");
 	transitionSlideTextures[3][1] = iLoadImage("Assets/Slides/Sp2.png");
-	strcpy_s(transitionSlideText[3][0], "Nature has awakened. The world is alive again..");
-	strcpy_s(transitionSlideText[3][1], "Aero's journey is complete... but hope will always have wings.");
+	strcpy_s(transitionSlideText[3][0], "The meadow blooms, the hunters retreat, and Spring returns to the land at last.");
+	strcpy_s(transitionSlideText[3][1], "All four seasons restored, Aero rises into the sky he fought so hard to save.");
 }
 
 // Call this to begin a transition: setIndex 0-3 selects which season's slides to show,
@@ -410,22 +410,53 @@ void drawTransitionSlides()
 // GAME COMPLETE SUMMARY SCREEN (shown after the final transition slides)
 // ============================================================================
 float gameCompleteGlowTimer = 0.0f;
+bool gameCompleteSongStarted = false;
+int gameCompleteSongGraceFrames = 0;
+bool gameCompleteEnterWasDown = true; // starts true so the carried-over key press from the last screen is ignored
 
 void resetGameCompleteScreen()
 {
 	gameCompleteGlowTimer = 0.0f;
+	gameCompleteSongStarted = false;
+	gameCompleteSongGraceFrames = 0;
+	gameCompleteEnterWasDown = true;
 }
 
 void updateGameCompleteScreen()
 {
 	gameCompleteGlowTimer += 0.03f;
 
-	if (isKeyPressed(13))
+	if (!gameCompleteSongStarted)
 	{
+		char playResult[128] = "";
+		mciSendString("play completesong from 0", playResult, sizeof(playResult), NULL);
+		printf("PLAY completesong result: [%s]\n", playResult);
+
+		char statusResult[128] = "";
+		mciSendString("status completesong mode", statusResult, sizeof(statusResult), NULL);
+		printf("STATUS completesong mode: [%s]\n", statusResult);
+
+		gameCompleteSongStarted = true;
+		gameCompleteSongGraceFrames = 30; // ~0.5s buffer before trusting the "finished" status
+	}
+
+	if (gameCompleteSongGraceFrames > 0)
+	{
+		gameCompleteSongGraceFrames--;
+	}
+
+	bool enterDown = isKeyPressed(13);
+	bool skipPressed = enterDown && !gameCompleteEnterWasDown;
+	gameCompleteEnterWasDown = enterDown;
+
+	bool songDone = (gameCompleteSongGraceFrames <= 0) && isCompleteSongFinished();
+
+	if (skipPressed || songDone)
+	{
+		stopCompleteSong();
 		addLeaderboardEntry(currentPlayerName, totalGameSeconds);
 		showingLeaderboard = true;
 		gameState = 0;
-		applyMusicSetting();
 	}
 }
 
@@ -450,12 +481,12 @@ void drawGameCompleteScreen()
 
 	glDisable(GL_BLEND);
 
-	char title[] = "GAME COMPLETE!";
+	char title[] = "CONGRATULATIONS!";
 	int titleLen = (int)strlen(title);
 	int titleCenterX = 640 - ((titleLen * 12) / 2);
 	drawGlowingText(titleCenterX, py + ph - 70, title, 60, 40, 10, 255, 220, 90, GLUT_BITMAP_TIMES_ROMAN_24);
 
-	char subtitle[] = "All Four Seasons Restored";
+	char subtitle[] = "For Completing the Game";
 	int subLen = (int)strlen(subtitle);
 	int subCenterX = 640 - ((subLen * 9) / 2);
 	drawGlowingText(subCenterX, py + ph - 115, subtitle, 30, 25, 15, 255, 255, 255, GLUT_BITMAP_HELVETICA_18);
@@ -481,7 +512,7 @@ void drawGameCompleteScreen()
 	int timeCenterX = 640 - ((timeLen * 9) / 2);
 	drawGlowingText(timeCenterX, py + ph - 215, timeLine, 20, 15, 10, 220, 235, 255, GLUT_BITMAP_HELVETICA_18);
 
-	char pressEnter[] = "Press ENTER to View Leaderboard";
+	char pressEnter[] = "Press ENTER to Skip";
 	int peLen = (int)strlen(pressEnter);
 	int peCenterX = 640 - ((peLen * 9) / 2);
 	drawGlowingText(peCenterX, py + 40, pressEnter, 30, 18, 8, 255, 255, 255, GLUT_BITMAP_HELVETICA_18);

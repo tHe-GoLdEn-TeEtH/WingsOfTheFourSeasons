@@ -131,6 +131,27 @@ void playShotSound()
 	}
 }
 
+void playCompleteSong()
+{
+	if (musicEnabled)
+	{
+		mciSendString("play completesong from 0", NULL, 0, NULL);
+	}
+}
+
+void stopCompleteSong()
+{
+	mciSendString("stop completesong", NULL, 0, NULL);
+	mciSendString("seek completesong to start", NULL, 0, NULL);
+}
+
+bool isCompleteSongFinished()
+{
+	char statusBuffer[64];
+	mciSendString("status completesong mode", statusBuffer, sizeof(statusBuffer), NULL);
+	return (strcmp(statusBuffer, "stopped") == 0);
+}
+
 void playGameOverSound()
 {
 	if (sfxEnabled)
