@@ -510,6 +510,7 @@ void updateLevel4()
 				// Shoot!
 				hunterState4[i] = HUNTER_SHOOTING_4;
 				hunterTimer4[i] = 14; // Muzzle flash display duration
+				playShotSound();
 
 				// Spawn bullet towards target
 				float muzzleOffsetX = hunterFacingLeft4[i] ? -42.0f : 42.0f;
