@@ -216,12 +216,19 @@ void fixedUpdate()
 			escKeyWasDown = false;
 			pKeyWasDown = false;
 			applyMusicSetting();
+			stopSpringSound();
+		}
+
+		if (gameOver)
+		{
+			stopSpringSound();
 		}
 
 		// Spring completed: All Four Seasons restored! Grand game completion!
 		if (levelComplete && (isKeyPressed(13)))
 		{
 			startTransitionSlides(3, 12);
+			stopSpringSound();
 		}
 	}
 	else if (gameState == 10)
@@ -357,6 +364,8 @@ int main()
 	mciSendString("open \"Audios//Thunder.mp3\" alias thundersound", NULL, 0, NULL);
 	mciSendString("open \"Audios//Drama.mp3\" alias dramasound", NULL, 0, NULL);
 	mciSendString("open \"Audios//WinterWind.mp3\" alias windsound", NULL, 0, NULL);
+	mciSendString("open \"Audios//Spring.mp3\" alias springsound", NULL, 0, NULL);
+
 	// Playing the background audio on repeat
 	mciSendString("play bgsong repeat", NULL, 0, NULL);
 
