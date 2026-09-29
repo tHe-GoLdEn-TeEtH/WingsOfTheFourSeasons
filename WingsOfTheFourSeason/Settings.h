@@ -95,6 +95,20 @@ void stopDramaSound()
 	mciSendString("seek dramasound to start", NULL, 0, NULL);
 }
 
+void startWindSound()
+{
+	if (sfxEnabled)
+	{
+		mciSendString("play windsound repeat", NULL, 0, NULL);
+	}
+}
+
+void stopWindSound()
+{
+	mciSendString("stop windsound", NULL, 0, NULL);
+	mciSendString("seek windsound to start", NULL, 0, NULL);
+}
+
 void playGameOverSound()
 {
 	if (sfxEnabled)
