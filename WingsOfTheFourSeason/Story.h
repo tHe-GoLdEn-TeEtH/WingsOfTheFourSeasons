@@ -428,14 +428,7 @@ void updateGameCompleteScreen()
 
 	if (!gameCompleteSongStarted)
 	{
-		char playResult[128] = "";
-		mciSendString("play completesong from 0", playResult, sizeof(playResult), NULL);
-		printf("PLAY completesong result: [%s]\n", playResult);
-
-		char statusResult[128] = "";
-		mciSendString("status completesong mode", statusResult, sizeof(statusResult), NULL);
-		printf("STATUS completesong mode: [%s]\n", statusResult);
-
+		playCompleteSong();
 		gameCompleteSongStarted = true;
 		gameCompleteSongGraceFrames = 30; // ~0.5s buffer before trusting the "finished" status
 	}
@@ -462,40 +455,45 @@ void updateGameCompleteScreen()
 
 void drawGameCompleteScreen()
 {
-	iSetColor(0, 0, 0);
+	// Full-screen scenic background
+	iShowImage(0, 0, 1280, 720, gameCompleteBgTex);
+
+	// Soft dark tint over the whole background, simulating a gentle blur/defocus
+	// so the eye is pulled toward the sharp box in the center
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glColor4f(0.05f, 0.06f, 0.05f, 0.55f);
 	iFilledRectangle(0, 0, 1280, 720);
+	glDisable(GL_BLEND);
+
+	// Ornate seasonal frame, sized to preserve the artwork's aspect ratio (~1.86:1),
+	// shrunk down and shifted lower on screen
+	int pw = 760;
+	int ph = 409;
+	int px = (1280 - pw) / 2;
+	int py = 100;
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	int px = 240, py = 220, pw = 800, ph = 340;
-
-	for (int g = 3; g > 0; g--)
-	{
-		float pulse = 0.10f + (sinf(gameCompleteGlowTimer * 2.0f) * 0.04f);
-		glColor4f(1.0f, 0.85f, 0.35f, pulse + g * 0.03f);
-		drawRoundedRect(px - g * 3, py - g * 3, pw + g * 6, ph + g * 6, 22);
-	}
-	glColor4f(0.10f, 0.09f, 0.06f, 0.90f);
-	drawRoundedRect(px, py, pw, ph, 18);
-
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	iShowImage(px, py, pw, ph, gameCompleteFrameTex);
 	glDisable(GL_BLEND);
 
 	char title[] = "CONGRATULATIONS!";
 	int titleLen = (int)strlen(title);
-	int titleCenterX = 640 - ((titleLen * 12) / 2);
-	drawGlowingText(titleCenterX, py + ph - 70, title, 60, 40, 10, 255, 220, 90, GLUT_BITMAP_TIMES_ROMAN_24);
+	int titleCenterX = 640 - ((titleLen * 13) / 2);
+	drawGlowingText(titleCenterX, py + ph - 140, title, 50, 32, 8, 255, 220, 90, GLUT_BITMAP_TIMES_ROMAN_24);
 
 	char subtitle[] = "For Completing the Game";
 	int subLen = (int)strlen(subtitle);
-	int subCenterX = 640 - ((subLen * 9) / 2);
-	drawGlowingText(subCenterX, py + ph - 115, subtitle, 30, 25, 15, 255, 255, 255, GLUT_BITMAP_HELVETICA_18);
+	int subCenterX = 640 - ((subLen * 8) / 2);
+	drawGlowingText(subCenterX, py + ph - 180, subtitle, 25, 20, 12, 255, 255, 255, GLUT_BITMAP_HELVETICA_18);
 
 	char playerLine[60];
 	sprintf_s(playerLine, "Player: %s", currentPlayerName);
 	int playerLen = (int)strlen(playerLine);
-	int playerCenterX = 640 - ((playerLen * 9) / 2);
-	drawGlowingText(playerCenterX, py + ph - 175, playerLine, 20, 15, 10, 220, 235, 255, GLUT_BITMAP_HELVETICA_18);
+	int playerCenterX = 640 - ((playerLen * 8) / 2);
+	drawGlowingText(playerCenterX, py + ph - 235, playerLine, 16, 12, 8, 220, 235, 255, GLUT_BITMAP_HELVETICA_18);
 
 	char timeLine[60];
 	int minutes = totalGameSeconds / 60;
@@ -509,13 +507,12 @@ void drawGameCompleteScreen()
 		sprintf_s(timeLine, "Total Time: %ds", seconds);
 	}
 	int timeLen = (int)strlen(timeLine);
-	int timeCenterX = 640 - ((timeLen * 9) / 2);
-	drawGlowingText(timeCenterX, py + ph - 215, timeLine, 20, 15, 10, 220, 235, 255, GLUT_BITMAP_HELVETICA_18);
+	int timeCenterX = 640 - ((timeLen * 8) / 2);
+	drawGlowingText(timeCenterX, py + ph - 270, timeLine, 16, 12, 8, 220, 235, 255, GLUT_BITMAP_HELVETICA_18);
 
 	char pressEnter[] = "Press ENTER to Skip";
 	int peLen = (int)strlen(pressEnter);
-	int peCenterX = 640 - ((peLen * 9) / 2);
-	drawGlowingText(peCenterX, py + 40, pressEnter, 30, 18, 8, 255, 255, 255, GLUT_BITMAP_HELVETICA_18);
+	int peCenterX = 640 - ((peLen * 8) / 2);
+	drawGlowingText(peCenterX, py + 45, pressEnter, 25, 15, 6, 255, 255, 255, GLUT_BITMAP_HELVETICA_18);
 }
-
 #endif

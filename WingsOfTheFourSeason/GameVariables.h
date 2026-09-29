@@ -218,11 +218,14 @@ int fishBaseY2[FISH_COUNT_2] = { 75, 75, 75, 75, 75 };   // remembers each fish'
 int fishStartX2[FISH_COUNT_2] = { 710, 1430, 2150, 2870, 3590 }; // takeoff X position for parabolic leap
 int fishType2[FISH_COUNT_2] = { 0, 1, 0, 1, 0 };
 
+
 unsigned int winterMsgTex;
 unsigned int monsoonMsgTex;
 unsigned int summerMsgTex;
 unsigned int springMsgTex;
 unsigned int creditsScreenTex;
+unsigned int gameCompleteFrameTex;
+unsigned int gameCompleteBgTex;
 
 void loadLevelCompleteMessages()
 {
@@ -231,7 +234,10 @@ void loadLevelCompleteMessages()
 	summerMsgTex = iLoadImage("Assets/SMsg.png");
 	springMsgTex = iLoadImage("Assets/SpMsg.png");
 	creditsScreenTex = iLoadImage("Assets/Credits.png");
+	gameCompleteFrameTex = iLoadImage("Assets/CcBg.png");
+	gameCompleteBgTex = iLoadImage("Assets/FinalBg.png");
 }
+
 
 void loadAeroSprites()
 {
