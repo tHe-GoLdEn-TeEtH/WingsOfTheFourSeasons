@@ -228,26 +228,26 @@ void loadTransitionSlides()
 	// After Level 1 (Winter) -> before Level 2 (Monsoon)
 	transitionSlideTextures[0][0] = iLoadImage("Assets/Slides/W1.png");
 	transitionSlideTextures[0][1] = iLoadImage("Assets/Slides/W2.png");
-	strcpy_s(transitionSlideText[0][0], "The frost is broken. Nature takes its first breath again.");
-	strcpy_s(transitionSlideText[0][1], "But the storm is coming. Aero must follow the waters into a new season.");
+	strcpy_s(transitionSlideText[0][0], "Winter's grip has loosened, and the frozen rivers begin to sing once more.");
+	strcpy_s(transitionSlideText[0][1], "But far to the south, dark clouds gather, and the rains of Monsoon await Aero's wings.");
 
 	// After Level 2 (Monsoon) -> before Level 3 (Summer)
 	transitionSlideTextures[1][0] = iLoadImage("Assets/Slides/R1.png");
 	transitionSlideTextures[1][1] = iLoadImage("Assets/Slides/R2.png");
-	strcpy_s(transitionSlideText[1][0], "The waters flow freely again. Life returns with every drop.");
-	strcpy_s(transitionSlideText[1][1], "The rain has passed. Now Aero must cross a land thirsty for life.");
+	strcpy_s(transitionSlideText[1][0], "The floods recede and the jungle breathes easy once more, thanks to Aero's courage.");
+	strcpy_s(transitionSlideText[1][1], "Now the desert sun calls, its heat rising over dunes that have long forgotten rain.");
 
 	// After Level 3 (Summer) -> before Level 4 (Spring)
 	transitionSlideTextures[2][0] = iLoadImage("Assets/Slides/S1.png");
 	transitionSlideTextures[2][1] = iLoadImage("Assets/Slides/S2.png");
-	strcpy_s(transitionSlideText[2][0], "The dry land drinks once more. Hope begins to bloom.");
+	strcpy_s(transitionSlideText[2][0], "The desert blooms again, and Aero presses onward, weary but unbroken.");
 	strcpy_s(transitionSlideText[2][1], "One season remains. Spring's hunters wait in the meadow, guarding the last piece of balance.");
 
 	// After Level 4 (Spring) -> Game Complete screen
 	transitionSlideTextures[3][0] = iLoadImage("Assets/Slides/Sp1.png");
 	transitionSlideTextures[3][1] = iLoadImage("Assets/Slides/Sp2.png");
-	strcpy_s(transitionSlideText[3][0], "Nature has awakened. The world is alive again..");
-	strcpy_s(transitionSlideText[3][1], "Aero's journey is complete... but hope will always have wings.");
+	strcpy_s(transitionSlideText[3][0], "The meadow blooms, the hunters retreat, and Spring returns to the land at last.");
+	strcpy_s(transitionSlideText[3][1], "All four seasons restored, Aero rises into the sky he fought so hard to save.");
 }
 
 // Call this to begin a transition: setIndex 0-3 selects which season's slides to show,
@@ -410,61 +410,90 @@ void drawTransitionSlides()
 // GAME COMPLETE SUMMARY SCREEN (shown after the final transition slides)
 // ============================================================================
 float gameCompleteGlowTimer = 0.0f;
+bool gameCompleteSongStarted = false;
+int gameCompleteSongGraceFrames = 0;
+bool gameCompleteEnterWasDown = true; // starts true so the carried-over key press from the last screen is ignored
 
 void resetGameCompleteScreen()
 {
 	gameCompleteGlowTimer = 0.0f;
+	gameCompleteSongStarted = false;
+	gameCompleteSongGraceFrames = 0;
+	gameCompleteEnterWasDown = true;
 }
 
 void updateGameCompleteScreen()
 {
 	gameCompleteGlowTimer += 0.03f;
 
-	if (isKeyPressed(13))
+	if (!gameCompleteSongStarted)
 	{
+		playCompleteSong();
+		gameCompleteSongStarted = true;
+		gameCompleteSongGraceFrames = 30; // ~0.5s buffer before trusting the "finished" status
+	}
+
+	if (gameCompleteSongGraceFrames > 0)
+	{
+		gameCompleteSongGraceFrames--;
+	}
+
+	bool enterDown = isKeyPressed(13);
+	bool skipPressed = enterDown && !gameCompleteEnterWasDown;
+	gameCompleteEnterWasDown = enterDown;
+
+	bool songDone = (gameCompleteSongGraceFrames <= 0) && isCompleteSongFinished();
+
+	if (skipPressed || songDone)
+	{
+		stopCompleteSong();
 		addLeaderboardEntry(currentPlayerName, totalGameSeconds);
 		showingLeaderboard = true;
 		gameState = 0;
-		applyMusicSetting();
 	}
 }
 
 void drawGameCompleteScreen()
 {
-	iSetColor(0, 0, 0);
+	// Full-screen scenic background
+	iShowImage(0, 0, 1280, 720, gameCompleteBgTex);
+
+	// Soft dark tint over the whole background, simulating a gentle blur/defocus
+	// so the eye is pulled toward the sharp box in the center
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glColor4f(0.05f, 0.06f, 0.05f, 0.55f);
 	iFilledRectangle(0, 0, 1280, 720);
+	glDisable(GL_BLEND);
+
+	// Ornate seasonal frame, sized to preserve the artwork's aspect ratio (~1.86:1),
+	// shrunk down and shifted lower on screen
+	int pw = 760;
+	int ph = 409;
+	int px = (1280 - pw) / 2;
+	int py = 100;
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	int px = 240, py = 220, pw = 800, ph = 340;
-
-	for (int g = 3; g > 0; g--)
-	{
-		float pulse = 0.10f + (sinf(gameCompleteGlowTimer * 2.0f) * 0.04f);
-		glColor4f(1.0f, 0.85f, 0.35f, pulse + g * 0.03f);
-		drawRoundedRect(px - g * 3, py - g * 3, pw + g * 6, ph + g * 6, 22);
-	}
-	glColor4f(0.10f, 0.09f, 0.06f, 0.90f);
-	drawRoundedRect(px, py, pw, ph, 18);
-
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	iShowImage(px, py, pw, ph, gameCompleteFrameTex);
 	glDisable(GL_BLEND);
 
-	char title[] = "GAME COMPLETE!";
+	char title[] = "CONGRATULATIONS!";
 	int titleLen = (int)strlen(title);
-	int titleCenterX = 640 - ((titleLen * 12) / 2);
-	drawGlowingText(titleCenterX, py + ph - 70, title, 60, 40, 10, 255, 220, 90, GLUT_BITMAP_TIMES_ROMAN_24);
+	int titleCenterX = 640 - ((titleLen * 13) / 2);
+	drawGlowingText(titleCenterX, py + ph - 140, title, 50, 32, 8, 255, 220, 90, GLUT_BITMAP_TIMES_ROMAN_24);
 
-	char subtitle[] = "All Four Seasons Restored";
+	char subtitle[] = "For Completing the Game";
 	int subLen = (int)strlen(subtitle);
-	int subCenterX = 640 - ((subLen * 9) / 2);
-	drawGlowingText(subCenterX, py + ph - 115, subtitle, 30, 25, 15, 255, 255, 255, GLUT_BITMAP_HELVETICA_18);
+	int subCenterX = 640 - ((subLen * 8) / 2);
+	drawGlowingText(subCenterX, py + ph - 180, subtitle, 25, 20, 12, 255, 255, 255, GLUT_BITMAP_HELVETICA_18);
 
 	char playerLine[60];
 	sprintf_s(playerLine, "Player: %s", currentPlayerName);
 	int playerLen = (int)strlen(playerLine);
-	int playerCenterX = 640 - ((playerLen * 9) / 2);
-	drawGlowingText(playerCenterX, py + ph - 175, playerLine, 20, 15, 10, 220, 235, 255, GLUT_BITMAP_HELVETICA_18);
+	int playerCenterX = 640 - ((playerLen * 8) / 2);
+	drawGlowingText(playerCenterX, py + ph - 235, playerLine, 16, 12, 8, 220, 235, 255, GLUT_BITMAP_HELVETICA_18);
 
 	char timeLine[60];
 	int minutes = totalGameSeconds / 60;
@@ -478,13 +507,12 @@ void drawGameCompleteScreen()
 		sprintf_s(timeLine, "Total Time: %ds", seconds);
 	}
 	int timeLen = (int)strlen(timeLine);
-	int timeCenterX = 640 - ((timeLen * 9) / 2);
-	drawGlowingText(timeCenterX, py + ph - 215, timeLine, 20, 15, 10, 220, 235, 255, GLUT_BITMAP_HELVETICA_18);
+	int timeCenterX = 640 - ((timeLen * 8) / 2);
+	drawGlowingText(timeCenterX, py + ph - 270, timeLine, 16, 12, 8, 220, 235, 255, GLUT_BITMAP_HELVETICA_18);
 
-	char pressEnter[] = "Press ENTER to View Leaderboard";
+	char pressEnter[] = "Press ENTER to Skip";
 	int peLen = (int)strlen(pressEnter);
-	int peCenterX = 640 - ((peLen * 9) / 2);
-	drawGlowingText(peCenterX, py + 40, pressEnter, 30, 18, 8, 255, 255, 255, GLUT_BITMAP_HELVETICA_18);
+	int peCenterX = 640 - ((peLen * 8) / 2);
+	drawGlowingText(peCenterX, py + 45, pressEnter, 25, 15, 6, 255, 255, 255, GLUT_BITMAP_HELVETICA_18);
 }
-
 #endif
