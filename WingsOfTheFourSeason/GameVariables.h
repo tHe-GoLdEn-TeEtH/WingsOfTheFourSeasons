@@ -222,6 +222,7 @@ unsigned int winterMsgTex;
 unsigned int monsoonMsgTex;
 unsigned int summerMsgTex;
 unsigned int springMsgTex;
+unsigned int creditsScreenTex;
 
 void loadLevelCompleteMessages()
 {
@@ -229,6 +230,7 @@ void loadLevelCompleteMessages()
 	monsoonMsgTex = iLoadImage("Assets/MMsg.png");
 	summerMsgTex = iLoadImage("Assets/SMsg.png");
 	springMsgTex = iLoadImage("Assets/SpMsg.png");
+	creditsScreenTex = iLoadImage("Assets/Credits.png");
 }
 
 void loadAeroSprites()

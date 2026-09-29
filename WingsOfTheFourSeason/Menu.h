@@ -195,23 +195,11 @@ void drawMenu()
 
 	if (showingCredits)
 	{
-		iSetColor(35, 35, 45);
-		iFilledRectangle(300, 200, 680, 320);
+		iShowImage(0, 0, 1280, 720, creditsScreenTex);
 
-		iSetColor(255, 255, 255);
-		char creditsTitle[] = "CREDITS";
-		iText(590, 470, creditsTitle);
-
-		char line1[] = "Wings of the Four Seasons";
-		char line2[] = "A game about restoring nature";
-		char line3[] = "Made with iGraphics";
-		iText(420, 400, line1);
-		iText(420, 360, line2);
-		iText(420, 320, line3);
-
-		iSetColor(160, 175, 175);
+		iSetColor(220, 220, 220);
 		char backMsg3[] = "ESC to go back";
-		iText(500, 240, backMsg3);
+		iText(560, 30, backMsg3);
 
 		return;
 	}
