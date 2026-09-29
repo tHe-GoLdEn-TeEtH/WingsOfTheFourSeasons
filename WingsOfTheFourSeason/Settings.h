@@ -123,6 +123,14 @@ void stopSpringSound()
 	mciSendString("seek springsound to start", NULL, 0, NULL);
 }
 
+void playShotSound()
+{
+	if (sfxEnabled)
+	{
+		mciSendString("play shotsound from 0", NULL, 0, NULL);
+	}
+}
+
 void playGameOverSound()
 {
 	if (sfxEnabled)

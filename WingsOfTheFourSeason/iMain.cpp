@@ -365,6 +365,7 @@ int main()
 	mciSendString("open \"Audios//Drama.mp3\" alias dramasound", NULL, 0, NULL);
 	mciSendString("open \"Audios//WinterWind.mp3\" alias windsound", NULL, 0, NULL);
 	mciSendString("open \"Audios//Spring.mp3\" alias springsound", NULL, 0, NULL);
+	mciSendString("open \"Audios//Shot.mp3\" alias shotsound", NULL, 0, NULL);
 
 	// Playing the background audio on repeat
 	mciSendString("play bgsong repeat", NULL, 0, NULL);
