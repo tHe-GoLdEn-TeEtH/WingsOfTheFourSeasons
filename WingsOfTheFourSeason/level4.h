@@ -844,7 +844,7 @@ void drawLevel4()
 		glPopMatrix();
 	}
 
-	// 4. AERIAL HANGING NET TRAPS
+	// 4. AERIAL HANGING NET TRAPS (suspended by a long rope from above)
 	for (int i = 0; i < NET_COUNT_4; i++)
 	{
 		int nx = wrapScreenX(netX4[i], cameraX);
@@ -859,6 +859,18 @@ void drawLevel4()
 		glPushMatrix();
 		glTranslatef((float)nx, (float)(ny + nh), 0.0f);
 		glRotatef(netSway, 0.0f, 0.0f, 1.0f);
+
+		// Long rope stretching from the net's pivot up past the top of the screen,
+		// swaying together with the net so it reads as a single hanging object
+		float ropeLength = 720.0f - (float)(ny + nh) + 80.0f;
+		iSetColor(90, 65, 40);
+		glLineWidth(3.0f);
+		glBegin(GL_LINES);
+		glVertex2f(0.0f, 0.0f);
+		glVertex2f(0.0f, ropeLength);
+		glEnd();
+		glLineWidth(1.0f);
+
 		iShowImage(-nw / 2, -nh, nw, nh, netTrapTex4);
 		glPopMatrix();
 	}
