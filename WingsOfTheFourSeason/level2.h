@@ -1056,6 +1056,7 @@ void updateLevel2()
 		{
 			lightningState2 = 2;
 			lightningTimer2 = 10;
+			playThunderSound();
 
 			int strikeScreenX = wrapScreenX(cloudX2[lightningCloudIndex2], cameraX);
 			int aeroScreenX2 = wrapScreenX(aeroX, cameraX);

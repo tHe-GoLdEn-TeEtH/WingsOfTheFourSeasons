@@ -73,6 +73,14 @@ void stopRainSound()
 	mciSendString("seek rainsound to start", NULL, 0, NULL);
 }
 
+void playThunderSound()
+{
+	if (sfxEnabled)
+	{
+		mciSendString("play thundersound from 0", NULL, 0, NULL);
+	}
+}
+
 void playGameOverSound()
 {
 	if (sfxEnabled)
