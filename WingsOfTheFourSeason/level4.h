@@ -252,9 +252,11 @@ void fireBullet4(float startX, float startY, float targetX, float targetY)
 void resetLevel4()
 {
 	loadLevel4Assets();
+	startSpringSound();
 
 	aeroX = 150;
 	aeroY = 320;
+
 	aeroFacingRight = true;
 	currentAeroFrame = 0;
 	aeroAnimCounter = 0;

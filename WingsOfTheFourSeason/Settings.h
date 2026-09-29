@@ -109,6 +109,20 @@ void stopWindSound()
 	mciSendString("seek windsound to start", NULL, 0, NULL);
 }
 
+void startSpringSound()
+{
+	if (sfxEnabled)
+	{
+		mciSendString("play springsound repeat", NULL, 0, NULL);
+	}
+}
+
+void stopSpringSound()
+{
+	mciSendString("stop springsound", NULL, 0, NULL);
+	mciSendString("seek springsound to start", NULL, 0, NULL);
+}
+
 void playGameOverSound()
 {
 	if (sfxEnabled)
